@@ -9,6 +9,7 @@ export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
+  const [uuid,setuuid]=useState(null);
 
   const googleSignIn = () => {
     const provider = new GoogleAuthProvider();
@@ -20,39 +21,43 @@ export const AuthContextProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+   
       const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
         setUser(currentUser);
         if (currentUser) {
-          const profile = await getUserProfile(currentUser.email);
+          const profile = await getUserProfile(uuid);
+          console.log(profile);
           if (profile) {
             setUserData(profile);
+            setuuid(profile.user_id);
           } else {
             const newUserProfile = {
-              user_name: currentUser.displayName,
-              email: currentUser.email,
-              profile_pic: currentUser.photoURL,
-              user_id: currentUser.uid,
-              created_at: currentUser.metadata.creationTime,
-              updated_at: currentUser.metadata.lastSignInTime,
-              is_admin: false,
-              registration_number: ''
+              "displayName": currentUser.displayName,
+              "email": currentUser.email,
+              "photoURL": currentUser.photoURL,
+              "uid": currentUser.uid,
+              "metadata":{
+                "creationTime": currentUser.metadata.creationTime,
+                "lastSignInTime": currentUser.metadata.lastSignInTime},
+            
             };
             const uuid = await setUserProfile(newUserProfile);
             if (uuid) {
               newUserProfile.user_id = uuid; // Set the uuid as user_id or any other property you want
               setUserData(newUserProfile);
+              setuuid(newUserProfile.user_id);
             }
           }
+
         }
         setLoading(false);
       });
       return () => unsubscribe();
-    }
+    
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, googleSignIn, logOut, loading, userData }}>
+    <AuthContext.Provider value={{ user, googleSignIn, logOut, loading, userData, uuid }}>
       {children}
     </AuthContext.Provider>
   );

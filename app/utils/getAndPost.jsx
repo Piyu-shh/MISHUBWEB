@@ -4,11 +4,10 @@ import axios from 'axios';
 
 const apiUrl = 'https://mis-hub-backend-git-main-amrit-sundarkas-projects.vercel.app/profile';
 
+
 export const getUserProfile = async (userId) => {
   try {
-    const response = await axios.get(`${apiUrl}/get_user_data`, {
-      params: { user_id: userId }
-    });
+    const response = await axios.get(`https://mis-hub-backend-git-main-amrit-sundarkas-projects.vercel.app/profile/get_profile/?user_id=${userId}`);
 
     // Assuming the API response contains the user data in a field called 'data'
     return response.data;
@@ -29,7 +28,8 @@ export const setUserProfile = async (userData) => {
       return uuid;
     } else {
       console.error(`Failed to set profile: ${response.data}`);
-      return null;
+      const uuid = response.data;
+      return uuid;
     }
   } catch (error) {
     console.error('Error setting user profile:', error);
